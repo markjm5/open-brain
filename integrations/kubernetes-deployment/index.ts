@@ -137,6 +137,7 @@ Only extract what's explicitly there.`,
 
 // --- MCP Server Setup ---
 
+function buildServer(): McpServer {
 const server = new McpServer({
   name: "open-brain",
   version: "1.0.0",
@@ -563,19 +564,49 @@ server.registerTool(
   }
 );
 
+return server;
+}
+
 // --- Hono App with Auth Check ---
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, content-type, x-brain-key, accept, mcp-session-id, mcp-protocol-version, last-event-id",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS, DELETE",
+};
+
 const app = new Hono();
+
+app.options("*", (c) => c.text("ok", 200, corsHeaders));
 
 app.all("*", async (c) => {
   const provided = c.req.header("x-brain-key") || new URL(c.req.url).searchParams.get("key");
   if (!provided || provided !== MCP_ACCESS_KEY) {
-    return c.json({ error: "Invalid or missing access key" }, 401);
+    return c.json({ error: "Invalid or missing access key" }, 401, corsHeaders);
   }
 
+  // Claude Desktop connectors don't send Accept: text/event-stream — patch it in.
+  if (!c.req.header("accept")?.includes("text/event-stream")) {
+    const headers = new Headers(c.req.raw.headers);
+    headers.set("Accept", "application/json, text/event-stream");
+    const patched = new Request(c.req.raw.url, {
+      method: c.req.raw.method,
+      headers,
+      body: c.req.raw.body,
+      // @ts-ignore -- duplex required for streaming body in Deno
+      duplex: "half",
+    });
+    Object.defineProperty(c.req, "raw", { value: patched, writable: true });
+  }
+
+  const server = buildServer();
   const transport = new StreamableHTTPTransport();
   await server.connect(transport);
-  return transport.handleRequest(c);
+  const response = await transport.handleRequest(c);
+  if (!response) return c.json({ error: "No response from MCP transport" }, 500, corsHeaders);
+  response.headers.delete("mcp-session-id");
+  for (const [k, v] of Object.entries(corsHeaders)) response.headers.set(k, v);
+  return response;
 });
 
 Deno.serve({ port: parseInt(Deno.env.get("PORT") || "8000", 10) }, app.fetch);

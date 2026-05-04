@@ -98,6 +98,7 @@ Only extract what's explicitly there.`,
 
 // --- MCP Server Setup ---
 
+function buildServer(): McpServer {
 const server = new McpServer({
   name: "open-brain",
   version: "1.0.0",
@@ -504,6 +505,9 @@ server.registerTool(
   }
 );
 
+return server;
+}
+
 // --- Hono App with Auth + CORS ---
 
 const corsHeaders = {
@@ -542,9 +546,14 @@ app.all("*", async (c) => {
     Object.defineProperty(c.req, "raw", { value: patched, writable: true });
   }
 
+  const server = buildServer();
   const transport = new StreamableHTTPTransport();
   await server.connect(transport);
-  return transport.handleRequest(c);
+  const response = await transport.handleRequest(c);
+  if (!response) return c.json({ error: "No response from MCP transport" }, 500, corsHeaders);
+  response.headers.delete("mcp-session-id");
+  for (const [k, v] of Object.entries(corsHeaders)) response.headers.set(k, v);
+  return response;
 });
 
 Deno.serve(app.fetch);
