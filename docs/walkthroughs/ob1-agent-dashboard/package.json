@@ -9,7 +9,9 @@
     "guide": "node generate-guide.mjs",
     "voiceover": "node generate-voiceover.mjs",
     "prepare-video": "node prepare-video-assets.mjs",
-    "video": "npm run prepare-video && remotion render video/src/index.ts OB1AgentDashboard output/OB1-Agent-Dashboard-Walkthrough.mp4 --codec=h264 --audio-codec=aac",
+    "video": "npm run prepare-video && npx remotion render video/src/index.ts OB1AgentDashboard output/OB1-Agent-Dashboard-Walkthrough.mp4 --codec=h264 --audio-codec=aac",
+    "endcap": "npm run prepare-video && npx remotion render video/src/index.ts OB1AgentMemoryEndcap output/OB1-Agent-Memory-Endcap-No-Audio.mp4 --codec=h264 --muted",
+    "announcement": "npm run prepare-video && npx remotion render video/src/index.ts OB1AgentMemoryAnnouncement output/OB1-Agent-Memory-Announcement-15s-No-Audio.mp4 --codec=h264 --muted",
     "build": "npm run screenshots && npm run guide && npm run voiceover && npm run video"
   },
   "dependencies": {

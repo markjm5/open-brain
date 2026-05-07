@@ -80,6 +80,40 @@ Verification:
 - Package source repo: `NateBJones-Projects/OB1`
 - Package source commit: `c0ca493c66ae0e6516986206210b562c0e3ab6ab`
 - Package scan: pending at publish checkpoint
+- Package install status after audit: **blocked**. `openclaw plugins install clawhub:@natebjones/ob1-agent-memory`
+  reports that the package has no installable version because the 0.1.0
+  publish used custom tags without `latest`. `clawhub package inspect --versions`
+  shows version `0.1.0`, but `latestVersion` is `null`.
+
+## Prepared 0.1.1 Package Fix
+
+Prepared on 2026-05-04:
+
+- Package version bumped to `0.1.1`.
+- `npm run build` passed from the plugin package.
+- `npm pack --dry-run` produced `natebjones-ob1-agent-memory-0.1.1.tgz`
+  with built `dist/index.js`, `openclaw.plugin.json`, bundled skill files,
+  source files, and native smoke script.
+- `clawhub package publish --dry-run --json` passed with tags including
+  `latest`.
+- Public publish is waiting on explicit action-time confirmation because it
+  changes a public third-party registry listing.
+
+Planned 0.1.1 publish command:
+
+```bash
+npx -y clawhub@0.12.2 package publish integrations/openclaw-agent-memory/plugin \
+  --family code-plugin \
+  --name @natebjones/ob1-agent-memory \
+  --display-name "NBJ OB1 Agent Memory for OpenClaw" \
+  --version 0.1.1 \
+  --changelog "Package installability fix: publish plugin package with latest tag so OpenClaw can install typed OB1 Agent Memory tools from ClawHub." \
+  --tags latest,nbj,nate-jones,ob1,openbrain,agent-memory,openclaw,provenance \
+  --source-repo NateBJones-Projects/OB1 \
+  --source-commit "$(git rev-parse HEAD)" \
+  --source-ref "$(git rev-parse --abbrev-ref HEAD)" \
+  --source-path integrations/openclaw-agent-memory/plugin
+```
 
 License note: the OB1 repository is `FSL-1.1-MIT`. ClawHub requires public
 skills to be `MIT-0`, so the standalone skill files in
@@ -113,9 +147,9 @@ npx -y clawhub@0.12.2 package publish integrations/openclaw-agent-memory/plugin 
   --family code-plugin \
   --name @natebjones/ob1-agent-memory \
   --display-name "NBJ OB1 Agent Memory for OpenClaw" \
-  --version 0.1.0 \
-  --changelog "Initial NBJ OB1 Agent Memory tools for OpenClaw recall, write-back, review, inspection, and recall-trace debugging." \
-  --tags nbj,nate-jones,ob1,openbrain,agent-memory,openclaw,provenance \
+  --version 0.1.1 \
+  --changelog "Package installability fix: publish plugin package with latest tag so OpenClaw can install typed OB1 Agent Memory tools from ClawHub." \
+  --tags latest,nbj,nate-jones,ob1,openbrain,agent-memory,openclaw,provenance \
   --source-repo NateBJones-Projects/OB1 \
   --source-commit "$(git rev-parse HEAD)" \
   --source-ref "$(git rev-parse --abbrev-ref HEAD)" \
@@ -150,9 +184,9 @@ npx -y clawhub@0.12.2 package publish integrations/openclaw-agent-memory/plugin 
   --family code-plugin \
   --name @natebjones/ob1-agent-memory \
   --display-name "NBJ OB1 Agent Memory for OpenClaw" \
-  --version 0.1.0 \
-  --changelog "Initial NBJ OB1 Agent Memory tools for OpenClaw recall, write-back, review, inspection, and recall-trace debugging." \
-  --tags nbj,nate-jones,ob1,openbrain,agent-memory,openclaw,provenance \
+  --version 0.1.1 \
+  --changelog "Package installability fix: publish plugin package with latest tag so OpenClaw can install typed OB1 Agent Memory tools from ClawHub." \
+  --tags latest,nbj,nate-jones,ob1,openbrain,agent-memory,openclaw,provenance \
   --source-repo NateBJones-Projects/OB1 \
   --source-commit "$(git rev-parse HEAD)" \
   --source-ref "$(git rev-parse --abbrev-ref HEAD)" \
