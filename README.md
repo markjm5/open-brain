@@ -194,7 +194,9 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) for the full details. The short version:
 
 ## Who Maintains This
 
-Built by Nate B. Jones's team. Jonathan Edwards is the repo manager. Matt Hallett is the first community admin. Alan Shurafa serves as community reviewer, helping triage contributor PRs and surface merge-ready work for maintainers. PRs are reviewed by the automated agent + human admins.
+Created by [Nate B. Jones](https://github.com/NateBJones).
+
+The OB1 repo team: [Jonathan Edwards](https://github.com/justfinethanku), Repo Manager; [Matt Hallett](https://github.com/matthallett1), Community Admin; [Alan Shurafa](https://github.com/alanshurafa), Community Reviewer. PRs are reviewed by the automated agent + human admins.
 
 ## License
 
