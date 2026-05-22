@@ -194,7 +194,7 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) for the full details. The short version:
 
 ## Who Maintains This
 
-Built by Nate B. Jones's team. Matt Hallett is the first community admin and repo manager. PRs are reviewed by the automated agent + human admins.
+Built by Nate B. Jones's team. Matt Hallett is the first community admin and repo manager. Alan Shurafa serves as community reviewer, helping triage contributor PRs and surface merge-ready work for maintainers. PRs are reviewed by the automated agent + human admins.
 
 ## License
 
