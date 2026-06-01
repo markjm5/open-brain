@@ -1,5 +1,9 @@
 # Update Thought MCP
 
+![Community Contribution](https://img.shields.io/badge/OB1_COMMUNITY-Approved_Contribution-2ea44f?style=for-the-badge&logo=github)
+
+**Created by [@txcfi-scott](https://github.com/txcfi-scott)**
+
 > Standalone MCP Edge Function that adds an `update_thought` tool with optional `if_unchanged_since` optimistic concurrency for multi-writer setups.
 
 ## What It Does
