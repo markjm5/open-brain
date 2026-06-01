@@ -1,5 +1,9 @@
 # OB-Graph: Knowledge Graph Layer for Open Brain
 
+![Community Contribution](https://img.shields.io/badge/OB1_COMMUNITY-Approved_Contribution-2ea44f?style=for-the-badge&logo=github)
+
+**Created by [@alanshurafa](https://github.com/alanshurafa)**
+
 A knowledge graph you can build and query through your AI — powered by PostgreSQL, deployed as a Supabase Edge Function, and accessed via MCP.
 
 ## Why This Matters
