@@ -1,5 +1,9 @@
 # Editorial Policy + Weekly Auditor
 
+![Community Contribution](https://img.shields.io/badge/OB1_COMMUNITY-Approved_Contribution-2ea44f?style=for-the-badge&logo=github)
+
+**Created by [@HansBohlmann](https://github.com/HansBohlmann)**
+
 > A 40-rule constitution that governs every synthesis prompt in your Open Brain, plus a weekly auditor that enforces it. Synthesis stops drifting because drift becomes detectable.
 
 ## What It Is
