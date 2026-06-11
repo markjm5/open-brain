@@ -1,5 +1,13 @@
 # Enhanced Thoughts Columns and Utility RPCs
 
+<div align="center">
+
+![Community Contribution](https://img.shields.io/badge/OB1_COMMUNITY-Approved_Contribution-2ea44f?style=for-the-badge&logo=github)
+
+**Created by [@alanshurafa](https://github.com/alanshurafa)**
+
+</div>
+
 > Adds structured columns and utility functions to the Open Brain thoughts table for richer classification, full-text search, statistics, and connection discovery.
 
 ## What It Does
