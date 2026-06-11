@@ -1,5 +1,13 @@
 # Brain Health Monitoring
 
+<div align="center">
+
+![Community Contribution](https://img.shields.io/badge/OB1_COMMUNITY-Approved_Contribution-2ea44f?style=for-the-badge&logo=github)
+
+**Created by [@alanshurafa](https://github.com/alanshurafa)**
+
+</div>
+
 > SQL views and runbook for monitoring source volumes, enrichment gaps, ingestion pipeline health, stalled queues, and knowledge graph coverage.
 
 ## What It Does
