@@ -1,5 +1,13 @@
 # Brain Backup and Export
 
+<div align="center">
+
+![Community Contribution](https://img.shields.io/badge/OB1_COMMUNITY-Approved_Contribution-2ea44f?style=for-the-badge&logo=github)
+
+**Created by [@alanshurafa](https://github.com/alanshurafa)**
+
+</div>
+
 Export all Open Brain Supabase tables to local JSON files. The script paginates through PostgREST (1 000 rows per request), writes each table to a dated JSON file, and prints a summary.
 
 ## Prerequisites
