@@ -1,5 +1,9 @@
 # Auto-Capture Claude Code Adapter
 
+![Community Contribution](https://img.shields.io/badge/OB1_COMMUNITY-Approved_Contribution-2ea44f?style=for-the-badge&logo=github)
+
+**Created by [@alanshurafa](https://github.com/alanshurafa)**
+
 > Claude Code adapter for the [auto-capture](../auto-capture/) skill, adding automatic session-end thought capture via Claude Code hooks.
 
 ## Relationship to Upstream Skill
