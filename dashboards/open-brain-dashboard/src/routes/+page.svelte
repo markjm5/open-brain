@@ -262,54 +262,57 @@
 	<meta name="description" content="Visualize and search your captured thoughts" />
 </svelte:head>
 
-<div class="max-w-6xl mx-auto px-6 py-8">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
 	<!-- Header -->
-	<div class="mb-8 flex items-center justify-between gap-4 flex-wrap">
-		<div class="flex items-center gap-6 text-sm text-text-muted">
-			<span class="text-2xl font-bold text-text">{stats.total}</span>
-			<span>thoughts captured</span>
+	<div class="mb-6 sm:mb-8 flex items-center justify-between gap-3 flex-wrap">
+		<div class="flex items-center gap-3 sm:gap-6 text-sm text-text-muted">
+			<span class="text-xl sm:text-2xl font-bold text-text">{stats.total}</span>
+			<span class="hidden xs:inline">thoughts captured</span>
 		</div>
 
 		<!-- View Toggle -->
-		<div class="flex items-center gap-1 bg-bg-elevated rounded-lg p-1">
+		<div class="flex items-center gap-0.5 sm:gap-1 bg-bg-elevated rounded-lg p-1">
 			<button
 				onclick={switchToGrid}
-				class="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors
+				class="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-md text-sm font-medium transition-colors
 					{viewMode === 'grid' ? 'bg-primary text-white shadow-sm' : 'text-text-muted hover:text-text'}"
+				title="Grid view"
 			>
-				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
 						d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
 				</svg>
-				Grid
+				<span class="hidden sm:inline">Grid</span>
 			</button>
 			<button
 				onclick={switchToCalendar}
-				class="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors
+				class="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-md text-sm font-medium transition-colors
 					{viewMode === 'calendar' ? 'bg-primary text-white shadow-sm' : 'text-text-muted hover:text-text'}"
+				title="Calendar view"
 			>
-				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
 						d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
 				</svg>
-				Calendar
+				<span class="hidden sm:inline">Calendar</span>
 			</button>
 			<button
 				onclick={switchToWordCloud}
-				class="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors
+				class="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-md text-sm font-medium transition-colors
 					{viewMode === 'wordcloud' ? 'bg-primary text-white shadow-sm' : 'text-text-muted hover:text-text'}"
+				title="Word Cloud"
 			>
-				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
 						d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
 				</svg>
-				Word Cloud
+				<span class="hidden sm:inline">Word Cloud</span>
 			</button>
 		</div>
 
 		<button
 			onclick={() => showCapture = !showCapture}
-			class="px-4 py-2 bg-primary hover:bg-primary-light text-white rounded-lg font-medium transition-colors"
+			class="px-3 sm:px-4 py-2 bg-primary hover:bg-primary-light text-white rounded-lg font-medium transition-colors text-sm"
 		>
 			{showCapture ? 'Close' : '+ Capture'}
 		</button>
@@ -455,20 +458,20 @@
 				oninput={handleSearchInput}
 				onkeydown={handleSearchKeydown}
 				placeholder="Search thoughts..."
-				class="w-full bg-bg-elevated border border-white/10 rounded-xl px-5 py-3.5 pl-12 pr-56 text-text placeholder:text-text-muted focus:outline-none focus:border-primary transition-colors"
+				class="w-full bg-bg-elevated border border-white/10 rounded-xl px-5 py-3 sm:py-3.5 pl-10 sm:pl-12 pr-24 sm:pr-44 text-text placeholder:text-text-muted focus:outline-none focus:border-primary transition-colors text-sm sm:text-base"
 			/>
-			<svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<svg class="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 sm:w-5 h-4 sm:h-5 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
 			</svg>
-			<div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
+			<div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
 				{#if searchQuery.trim()}
 				<button
 					type="button"
 					onclick={clearSearchQuery}
 					aria-label="Clear search"
-					class="w-8 h-8 inline-flex items-center justify-center bg-white/5 hover:bg-white/10 text-text-muted hover:text-text rounded-full text-sm font-medium transition-colors"
+					class="w-7 h-7 sm:w-8 sm:h-8 inline-flex items-center justify-center bg-white/5 hover:bg-white/10 text-text-muted hover:text-text rounded-full transition-colors"
 				>
-					<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+					<svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
 					</svg>
 				</button>
@@ -476,9 +479,12 @@
 				<button
 					type="submit"
 					disabled={searching}
-					class="w-28 px-4 py-1.5 bg-primary hover:bg-primary-light disabled:opacity-70 text-white rounded-lg text-sm font-medium transition-colors text-center"
+					class="px-3 sm:px-4 py-1.5 bg-primary hover:bg-primary-light disabled:opacity-70 text-white rounded-lg text-xs sm:text-sm font-medium transition-colors"
 				>
-					{searching ? 'Searching...' : 'Search'}
+					<span class="hidden sm:inline">{searching ? 'Searching...' : 'Search'}</span>
+					<svg class="w-4 h-4 sm:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+					</svg>
 				</button>
 			</div>
 		</form>
@@ -648,15 +654,15 @@
 
 {#if selectedThought}
 	{@const activeThought = selectedThought}
-	<div class="fixed inset-0 z-50 p-4 flex items-center justify-center">
+	<div class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
 		<button
 			type="button"
 			class="absolute inset-0 bg-black/70 backdrop-blur-sm"
 			onclick={closeThoughtModal}
 			aria-label="Close thought modal"
 		></button>
-		<div class="relative w-full max-w-2xl bg-bg-card border border-white/10 rounded-2xl overflow-hidden">
-			<div class="flex items-start justify-between gap-3 p-5 border-b border-white/10">
+		<div class="relative w-full sm:max-w-2xl bg-bg-card border-t sm:border border-white/10 sm:rounded-2xl overflow-hidden max-h-[90vh] sm:max-h-[85vh] flex flex-col">
+			<div class="flex items-start justify-between gap-3 px-5 py-4 border-b border-white/10 shrink-0">
 				<div>
 					<div class="text-xs text-text-muted mb-1">{formatDate(activeThought.created_at)}</div>
 					<div class="text-sm font-medium text-text">
@@ -666,7 +672,7 @@
 				<button
 					type="button"
 					onclick={closeThoughtModal}
-					class="w-8 h-8 inline-flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-text-muted hover:text-text transition-colors"
+					class="w-8 h-8 inline-flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-text-muted hover:text-text transition-colors shrink-0"
 					aria-label="Close thought modal"
 				>
 					<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -675,11 +681,14 @@
 				</button>
 			</div>
 
-			<div class="p-5">
-				<div class="max-h-[65vh] overflow-y-auto pr-1 text-text leading-relaxed whitespace-pre-wrap">
+			<div class="p-5 overflow-y-auto">
+				<div class="text-text leading-relaxed whitespace-pre-wrap text-sm sm:text-base">
 					{activeThought.content}
 				</div>
 			</div>
+
+			<!-- Mobile drag handle indicator -->
+			<div class="sm:hidden absolute top-2 left-1/2 -translate-x-1/2 w-8 h-1 bg-white/20 rounded-full"></div>
 		</div>
 	</div>
 {/if}

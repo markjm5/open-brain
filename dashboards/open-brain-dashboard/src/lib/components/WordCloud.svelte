@@ -119,7 +119,7 @@
 
 	let containerEl: HTMLDivElement | undefined = $state();
 	let svgWidth = $state(900);
-	const svgHeight = 500;
+	let svgHeight = $state(500);
 
 	let placedWords = $state<PlacedWord[]>([]);
 	let generating = $state(false);
@@ -178,15 +178,22 @@
 		}
 	});
 
-	// Observe container width
+	// Observe container width and set responsive height
 	onMount(() => {
 		if (!containerEl) return;
+
+		function updateSize(w: number) {
+			svgWidth = Math.floor(w);
+			// Shorter cloud on narrow screens
+			svgHeight = w < 480 ? 300 : w < 768 ? 380 : 500;
+		}
+
 		const ro = new ResizeObserver((entries) => {
 			const w = entries[0]?.contentRect.width;
-			if (w && Math.abs(w - svgWidth) > 20) svgWidth = Math.floor(w);
+			if (w && Math.abs(w - svgWidth) > 20) updateSize(w);
 		});
 		ro.observe(containerEl);
-		svgWidth = containerEl.clientWidth || 900;
+		updateSize(containerEl.clientWidth || 900);
 		return () => ro.disconnect();
 	});
 
@@ -205,45 +212,43 @@
 
 <div class="select-none">
 	<!-- ── Toolbar ────────────────────────────────────────────────────── -->
-	<div class="mb-5 flex items-center justify-between flex-wrap gap-3">
+	<div class="mb-4 sm:mb-5 space-y-2 sm:space-y-0 sm:flex sm:items-center sm:justify-between sm:flex-wrap sm:gap-3">
 		<!-- Type filter pills -->
-		<div class="flex flex-wrap gap-2">
+		<div class="flex flex-wrap gap-1.5 sm:gap-2">
 			<button
 				onclick={() => (activeType = null)}
-				class="px-3 py-1.5 rounded-full text-sm font-medium transition-all
+				class="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all
 					{!activeType ? 'bg-primary text-white' : 'bg-bg-elevated text-text-muted hover:text-text'}"
 			>
-				All types
+				All
 			</button>
 			{#each THOUGHT_TYPES as t}
 				<button
 					onclick={() => (activeType = activeType === t.value ? null : t.value)}
-					class="px-3 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-1.5"
+					class="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all flex items-center gap-1 sm:gap-1.5"
 					style={activeType === t.value
 						? `background:${TYPE_COLOR[t.value]}22; color:${TYPE_COLOR[t.value]}; outline:1px solid ${TYPE_COLOR[t.value]}66`
 						: ''}
 					class:bg-bg-elevated={activeType !== t.value}
 					class:text-text-muted={activeType !== t.value}
 				>
-					<span
-						class="w-2 h-2 rounded-full"
-						style="background:{TYPE_COLOR[t.value]}"
-					></span>
-					{t.label}
+					<span class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full shrink-0" style="background:{TYPE_COLOR[t.value]}"></span>
+					<span class="hidden sm:inline">{t.label}</span>
+					<span class="sm:hidden">{t.label.replace(' Note', '')}</span>
 				</button>
 			{/each}
 		</div>
 
-		<div class="flex items-center gap-3">
+		<div class="flex items-center justify-between sm:justify-start gap-3">
 			<span class="text-xs text-text-muted">
 				{filteredThoughts.length} thoughts · {placedWords.length} words
 			</span>
 			<button
 				onclick={() => seed++}
-				class="flex items-center gap-1.5 px-3 py-1.5 bg-bg-elevated hover:bg-white/10 text-text-muted hover:text-text rounded-lg text-sm font-medium transition-colors"
+				class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-bg-elevated hover:bg-white/10 text-text-muted hover:text-text rounded-lg text-xs sm:text-sm font-medium transition-colors"
 				title="Shuffle layout"
 			>
-				<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<svg class="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
 						d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
 				</svg>
@@ -327,13 +332,13 @@
 	</div>
 
 	<!-- ── Legend ─────────────────────────────────────────────────────── -->
-	<div class="mt-4 flex items-center justify-center gap-5 flex-wrap">
+	<div class="mt-3 sm:mt-4 flex items-center justify-center gap-3 sm:gap-5 flex-wrap">
 		{#each THOUGHT_TYPES as t}
 			<span class="flex items-center gap-1.5 text-xs text-text-muted">
-				<span class="w-2 h-2 rounded-full" style="background:{TYPE_COLOR[t.value]}"></span>
+				<span class="w-2 h-2 rounded-full shrink-0" style="background:{TYPE_COLOR[t.value]}"></span>
 				{t.label}
 			</span>
 		{/each}
-		<span class="text-xs text-text-muted/40">· word size = frequency</span>
+		<span class="text-xs text-text-muted/40 hidden sm:inline">· word size = frequency</span>
 	</div>
 </div>

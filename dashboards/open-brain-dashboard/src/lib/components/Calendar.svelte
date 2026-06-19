@@ -169,36 +169,23 @@
 <!-- Calendar wrapper -->
 <div class="select-none">
 	<!-- ── Toolbar ─────────────────────────────────────────────────────── -->
-	<div class="mb-5 flex flex-wrap items-center gap-3">
-		<!-- View tabs -->
-		<div class="flex items-center gap-1 bg-bg-elevated rounded-lg p-1 shrink-0">
-			{#each (['month', 'week', 'day'] as const) as v}
-				<button
-					onclick={() => (view = v)}
-					class="px-3 py-1.5 rounded-md text-sm font-medium transition-colors capitalize
-						{view === v ? 'bg-primary text-white shadow-sm' : 'text-text-muted hover:text-text'}"
-				>
-					{v}
-				</button>
-			{/each}
-		</div>
-
-		<!-- Navigation -->
-		<div class="flex items-center gap-2 flex-1 justify-center">
+	<div class="mb-4 sm:mb-5 space-y-2 sm:space-y-0 sm:flex sm:flex-wrap sm:items-center sm:gap-3">
+		<!-- Row 1 on mobile: Nav + Today -->
+		<div class="flex items-center gap-2 sm:flex-1 sm:justify-center">
 			<button
 				onclick={prevPeriod}
 				aria-label="Previous"
-				class="w-8 h-8 flex items-center justify-center rounded-lg bg-bg-elevated hover:bg-white/10 text-text-muted hover:text-text transition-colors"
+				class="w-8 h-8 flex items-center justify-center rounded-lg bg-bg-elevated hover:bg-white/10 text-text-muted hover:text-text transition-colors shrink-0"
 			>
 				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
 				</svg>
 			</button>
-			<span class="text-text font-semibold min-w-64 text-center text-base">{headerTitle()}</span>
+			<span class="text-text font-semibold flex-1 text-center text-sm sm:text-base sm:min-w-48">{headerTitle()}</span>
 			<button
 				onclick={nextPeriod}
 				aria-label="Next"
-				class="w-8 h-8 flex items-center justify-center rounded-lg bg-bg-elevated hover:bg-white/10 text-text-muted hover:text-text transition-colors"
+				class="w-8 h-8 flex items-center justify-center rounded-lg bg-bg-elevated hover:bg-white/10 text-text-muted hover:text-text transition-colors shrink-0"
 			>
 				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -206,26 +193,39 @@
 			</button>
 			<button
 				onclick={goToday}
-				class="px-3 py-1.5 bg-bg-elevated hover:bg-white/10 text-text-muted hover:text-text rounded-lg text-sm font-medium transition-colors"
+				class="px-2.5 sm:px-3 py-1.5 bg-bg-elevated hover:bg-white/10 text-text-muted hover:text-text rounded-lg text-xs sm:text-sm font-medium transition-colors shrink-0"
 			>
 				Today
 			</button>
 		</div>
 
-		<!-- Period stats mini-legend -->
-		<div class="flex items-center gap-3 shrink-0">
-			{#each THOUGHT_TYPES as t}
-				{@const count = visibleStats[t.value] ?? 0}
-				{#if count > 0}
-					<span class="flex items-center gap-1.5 text-xs text-text-muted">
-						<span
-							class="w-2 h-2 rounded-full"
-							style="background:{TYPE_COLOR[t.value]}"
-						></span>
-						<span style="color:{TYPE_COLOR[t.value]}" class="font-medium">{count}</span>
-					</span>
-				{/if}
-			{/each}
+		<!-- Row 2 on mobile: View tabs + Stats -->
+		<div class="flex items-center justify-between sm:contents gap-3">
+			<!-- View tabs -->
+			<div class="flex items-center gap-1 bg-bg-elevated rounded-lg p-1 shrink-0">
+				{#each (['month', 'week', 'day'] as const) as v}
+					<button
+						onclick={() => (view = v)}
+						class="px-2.5 sm:px-3 py-1.5 rounded-md text-xs sm:text-sm font-medium transition-colors capitalize
+							{view === v ? 'bg-primary text-white shadow-sm' : 'text-text-muted hover:text-text'}"
+					>
+						{v}
+					</button>
+				{/each}
+			</div>
+
+			<!-- Period stats mini-legend -->
+			<div class="flex items-center gap-2 sm:gap-3 shrink-0">
+				{#each THOUGHT_TYPES as t}
+					{@const count = visibleStats[t.value] ?? 0}
+					{#if count > 0}
+						<span class="flex items-center gap-1 sm:gap-1.5 text-xs text-text-muted">
+							<span class="w-2 h-2 rounded-full shrink-0" style="background:{TYPE_COLOR[t.value]}"></span>
+							<span style="color:{TYPE_COLOR[t.value]}" class="font-medium">{count}</span>
+						</span>
+					{/if}
+				{/each}
+			</div>
 		</div>
 	</div>
 
@@ -233,9 +233,11 @@
 	{#if view === 'month'}
 		<!-- Day name header row -->
 		<div class="grid grid-cols-7 mb-1">
-			{#each DAY_NAMES as name}
+			{#each DAY_NAMES as name, i}
+				<!-- Single letter on mobile, 3-letter on sm+ -->
 				<div class="text-center text-xs text-text-muted font-medium py-2 tracking-wide uppercase">
-					{name}
+					<span class="sm:hidden">{name[0]}</span>
+					<span class="hidden sm:inline">{name}</span>
 				</div>
 			{/each}
 		</div>
@@ -250,7 +252,7 @@
 				{@const inMonth = isCurrentMonth(day)}
 				{@const today = isToday(day)}
 				<div
-					class="bg-bg-card min-h-28 p-2 transition-colors
+					class="bg-bg-card min-h-14 sm:min-h-28 p-1 sm:p-2 transition-colors
 						{inMonth ? 'hover:bg-bg-elevated' : 'opacity-30'}
 						{dayThoughts.length > 0 && inMonth ? 'cursor-pointer' : ''}"
 					onclick={() => { if (dayThoughts.length > 0 && inMonth) openDay(day); }}
@@ -264,41 +266,57 @@
 					}}
 				>
 					<!-- Day number -->
-					<div class="flex items-center justify-end mb-1.5">
+					<div class="flex items-center justify-end mb-1 sm:mb-1.5">
 						<span
-							class="w-6 h-6 flex items-center justify-center rounded-full text-xs font-semibold
+							class="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full text-xs font-semibold
 								{today ? 'bg-primary text-white' : 'text-text-muted'}"
 						>
 							{day.getDate()}
 						</span>
 					</div>
 
-					<!-- Events -->
-					<div class="space-y-0.5">
-						{#each dayThoughts.slice(0, 3) as thought}
-							<button
-								onclick={(e) => {
-									e.stopPropagation();
-									onSelectThought(thought);
-								}}
-								class="w-full text-left px-1.5 py-0.5 rounded text-xs truncate hover:opacity-75 transition-opacity"
-								style="background-color:{typeColor(thought.metadata.type)}1a; color:{typeColor(thought.metadata.type)}; border-left:2px solid {typeColor(thought.metadata.type)}"
-							>
-								{truncate(thought.content, 28)}
-							</button>
-						{/each}
-						{#if dayThoughts.length > 3}
-							<button
-								onclick={(e) => {
-									e.stopPropagation();
-									openDay(day);
-								}}
-								class="w-full text-left px-1.5 py-0.5 text-xs text-text-muted hover:text-text transition-colors font-medium"
-							>
-								+{dayThoughts.length - 3} more
-							</button>
-						{/if}
-					</div>
+					<!-- Events: dots on mobile, text labels on sm+ -->
+					{#if dayThoughts.length > 0}
+						<!-- Mobile: colored dots only -->
+						<div class="sm:hidden flex flex-wrap gap-0.5 justify-center">
+							{#each dayThoughts.slice(0, 5) as thought}
+								<span
+									class="w-1.5 h-1.5 rounded-full shrink-0"
+									style="background:{typeColor(thought.metadata.type)}"
+								></span>
+							{/each}
+							{#if dayThoughts.length > 5}
+								<span class="text-[9px] text-text-muted leading-none">+{dayThoughts.length - 5}</span>
+							{/if}
+						</div>
+
+						<!-- Desktop: text event labels -->
+						<div class="hidden sm:block space-y-0.5">
+							{#each dayThoughts.slice(0, 3) as thought}
+								<button
+									onclick={(e) => {
+										e.stopPropagation();
+										onSelectThought(thought);
+									}}
+									class="w-full text-left px-1.5 py-0.5 rounded text-xs truncate hover:opacity-75 transition-opacity"
+									style="background-color:{typeColor(thought.metadata.type)}1a; color:{typeColor(thought.metadata.type)}; border-left:2px solid {typeColor(thought.metadata.type)}"
+								>
+									{truncate(thought.content, 28)}
+								</button>
+							{/each}
+							{#if dayThoughts.length > 3}
+								<button
+									onclick={(e) => {
+										e.stopPropagation();
+										openDay(day);
+									}}
+									class="w-full text-left px-1.5 py-0.5 text-xs text-text-muted hover:text-text transition-colors font-medium"
+								>
+									+{dayThoughts.length - 3} more
+								</button>
+							{/if}
+						</div>
+					{/if}
 				</div>
 			{/each}
 		</div>
@@ -306,55 +324,58 @@
 
 	<!-- ── Week View ───────────────────────────────────────────────────── -->
 	{#if view === 'week'}
-		<div
-			class="grid grid-cols-7 gap-px rounded-xl overflow-hidden border border-white/5"
-			style="background:rgba(255,255,255,0.04)"
-		>
-			{#each getWeekDays() as day}
-				{@const dayThoughts = getThoughtsForDay(day)}
-				{@const today = isToday(day)}
-				<div class="bg-bg-card flex flex-col">
-					<!-- Day column header -->
-					<div
-						class="p-3 border-b border-white/5 text-center
-							{today ? 'bg-primary/10' : ''}"
-					>
-						<div class="text-xs text-text-muted uppercase tracking-wide font-medium">
-							{DAY_NAMES[day.getDay()]}
-						</div>
+		<!-- Horizontal scroll wrapper on mobile -->
+		<div class="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+			<div
+				class="grid gap-px rounded-xl overflow-hidden border border-white/5 min-w-[560px] sm:min-w-0"
+				style="grid-template-columns:repeat(7,1fr); background:rgba(255,255,255,0.04)"
+			>
+				{#each getWeekDays() as day}
+					{@const dayThoughts = getThoughtsForDay(day)}
+					{@const today = isToday(day)}
+					<div class="bg-bg-card flex flex-col">
+						<!-- Day column header -->
 						<div
-							class="mt-1.5 w-8 h-8 flex items-center justify-center rounded-full mx-auto text-sm font-bold
-								{today ? 'bg-primary text-white' : 'text-text'}"
+							class="p-2 sm:p-3 border-b border-white/5 text-center
+								{today ? 'bg-primary/10' : ''}"
 						>
-							{day.getDate()}
+							<div class="text-xs text-text-muted uppercase tracking-wide font-medium">
+								{DAY_NAMES[day.getDay()]}
+							</div>
+							<div
+								class="mt-1 sm:mt-1.5 w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center rounded-full mx-auto text-xs sm:text-sm font-bold
+									{today ? 'bg-primary text-white' : 'text-text'}"
+							>
+								{day.getDate()}
+							</div>
+						</div>
+
+						<!-- Day events -->
+						<div class="p-1.5 sm:p-2 space-y-1 sm:space-y-1.5 flex-1 min-h-28 sm:min-h-36 overflow-y-auto max-h-60 sm:max-h-72">
+							{#each dayThoughts as thought}
+								<button
+									onclick={() => onSelectThought(thought)}
+									class="w-full text-left p-1.5 sm:p-2 rounded-lg hover:opacity-80 transition-opacity"
+									style="background-color:{typeColor(thought.metadata.type)}18; border-left:2px solid {typeColor(thought.metadata.type)}"
+								>
+									<div
+										class="text-[10px] sm:text-xs font-semibold mb-0.5"
+										style="color:{typeColor(thought.metadata.type)}"
+									>
+										{formatTime(thought.created_at)}
+									</div>
+									<div class="text-[10px] sm:text-xs text-text leading-snug">
+										{truncate(thought.content, 40)}
+									</div>
+								</button>
+							{/each}
+							{#if dayThoughts.length === 0}
+								<div class="text-xs text-white/15 text-center py-4 sm:py-6 font-medium">—</div>
+							{/if}
 						</div>
 					</div>
-
-					<!-- Day events -->
-					<div class="p-2 space-y-1.5 flex-1 min-h-36 overflow-y-auto max-h-72">
-						{#each dayThoughts as thought}
-							<button
-								onclick={() => onSelectThought(thought)}
-								class="w-full text-left p-2 rounded-lg hover:opacity-80 transition-opacity"
-								style="background-color:{typeColor(thought.metadata.type)}18; border-left:2px solid {typeColor(thought.metadata.type)}"
-							>
-								<div
-									class="text-xs font-semibold mb-0.5"
-									style="color:{typeColor(thought.metadata.type)}"
-								>
-									{formatTime(thought.created_at)}
-								</div>
-								<div class="text-xs text-text leading-snug">
-									{truncate(thought.content, 60)}
-								</div>
-							</button>
-						{/each}
-						{#if dayThoughts.length === 0}
-							<div class="text-xs text-white/15 text-center py-6 font-medium">—</div>
-						{/if}
-					</div>
-				</div>
-			{/each}
+				{/each}
+			</div>
 		</div>
 	{/if}
 
