@@ -1,0 +1,19 @@
+# Netlify configuration for the Open Brain Dashboard
+# Docs: https://docs.netlify.com/configure-builds/file-based-configuration/
+
+[build]
+  # Build from the dashboard subdirectory
+  base    = "dashboards/open-brain-dashboard"
+  command = "npm run build"
+  # adapter-netlify writes static assets to "build/" by default
+  publish = "build"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Required environment variables (set these in Netlify UI → Site settings → Environment variables):
+#
+#   MCP_URL             = https://YOUR-PROJECT.supabase.co/functions/v1/open-brain-mcp
+#   MCP_KEY             = your-mcp-access-key
+#   PUBLIC_SUPABASE_URL = https://YOUR-PROJECT.supabase.co
+#   PUBLIC_SUPABASE_ANON_KEY = your-supabase-anon-key
