@@ -3,8 +3,9 @@
 	import { THOUGHT_TYPES, type Thought, type ThoughtType } from '$lib/types';
 	import { onMount } from 'svelte';
 	import Calendar from '$lib/components/Calendar.svelte';
+	import WordCloud from '$lib/components/WordCloud.svelte';
 
-	type ViewMode = 'grid' | 'calendar';
+	type ViewMode = 'grid' | 'calendar' | 'wordcloud';
 
 	let viewMode = $state<ViewMode>('grid');
 	let thoughts = $state<Thought[]>([]);
@@ -65,18 +66,27 @@
 		loading = false;
 	});
 
-	async function switchToCalendar() {
-		viewMode = 'calendar';
+	async function loadAllThoughts() {
 		if (calendarThoughts.length === 0) {
 			calendarLoading = true;
 			try {
 				calendarThoughts = await getThoughts({ limit: 500 });
 			} catch (err) {
-				console.error('Failed to load calendar thoughts:', err);
+				console.error('Failed to load thoughts:', err);
 			} finally {
 				calendarLoading = false;
 			}
 		}
+	}
+
+	async function switchToCalendar() {
+		viewMode = 'calendar';
+		await loadAllThoughts();
+	}
+
+	async function switchToWordCloud() {
+		viewMode = 'wordcloud';
+		await loadAllThoughts();
 	}
 
 	async function switchToGrid() {
@@ -284,6 +294,17 @@
 				</svg>
 				Calendar
 			</button>
+			<button
+				onclick={switchToWordCloud}
+				class="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors
+					{viewMode === 'wordcloud' ? 'bg-primary text-white shadow-sm' : 'text-text-muted hover:text-text'}"
+			>
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+						d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+				</svg>
+				Word Cloud
+			</button>
 		</div>
 
 		<button
@@ -351,6 +372,46 @@
 				thoughts={calendarThoughts}
 				onSelectThought={(t) => { selectedThought = t; }}
 			/>
+		{/if}
+	{/if}
+
+	<!-- ── Word Cloud View ────────────────────────────────────────────── -->
+	{#if viewMode === 'wordcloud'}
+		{#if showCapture}
+			<div class="mb-6 bg-bg-card border border-white/10 rounded-xl p-5">
+				<textarea
+					bind:value={captureContent}
+					placeholder="What's on your mind?"
+					rows={3}
+					class="w-full bg-transparent text-text placeholder:text-text-muted focus:outline-none resize-none"
+				></textarea>
+				<div class="flex justify-end gap-3 mt-3">
+					<button
+						onclick={() => showCapture = false}
+						class="px-4 py-2 text-text-muted hover:text-text transition-colors"
+					>
+						Cancel
+					</button>
+					<button
+						onclick={handleCapture}
+						disabled={!captureContent.trim() || capturing}
+						class="px-4 py-2 bg-primary hover:bg-primary-light disabled:opacity-50 text-white rounded-lg font-medium transition-colors"
+					>
+						{capturing ? 'Saving...' : 'Save'}
+					</button>
+				</div>
+			</div>
+		{/if}
+
+		{#if calendarLoading}
+			<div class="flex items-center justify-center py-24">
+				<div class="flex flex-col items-center gap-3">
+					<div class="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+					<div class="text-text-muted text-sm">Loading your thoughts…</div>
+				</div>
+			</div>
+		{:else}
+			<WordCloud thoughts={calendarThoughts} />
 		{/if}
 	{/if}
 
