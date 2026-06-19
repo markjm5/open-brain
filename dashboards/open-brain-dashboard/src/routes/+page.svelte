@@ -2,8 +2,14 @@
 	import { getStats, getThoughts, captureThought } from '$lib/api';
 	import { THOUGHT_TYPES, type Thought, type ThoughtType } from '$lib/types';
 	import { onMount } from 'svelte';
+	import Calendar from '$lib/components/Calendar.svelte';
 
+	type ViewMode = 'grid' | 'calendar';
+
+	let viewMode = $state<ViewMode>('grid');
 	let thoughts = $state<Thought[]>([]);
+	let calendarThoughts = $state<Thought[]>([]);
+	let calendarLoading = $state(false);
 	let loading = $state(true);
 	let searching = $state(false);
 	let hasSearched = $state(false);
@@ -58,6 +64,24 @@
 		await loadStats();
 		loading = false;
 	});
+
+	async function switchToCalendar() {
+		viewMode = 'calendar';
+		if (calendarThoughts.length === 0) {
+			calendarLoading = true;
+			try {
+				calendarThoughts = await getThoughts({ limit: 500 });
+			} catch (err) {
+				console.error('Failed to load calendar thoughts:', err);
+			} finally {
+				calendarLoading = false;
+			}
+		}
+	}
+
+	async function switchToGrid() {
+		viewMode = 'grid';
+	}
 
 	async function loadThoughts() {
 		const query = searchQuery.trim();
@@ -228,13 +252,40 @@
 	<meta name="description" content="Visualize and search your captured thoughts" />
 </svelte:head>
 
-<div class="max-w-5xl mx-auto px-6 py-8">
+<div class="max-w-6xl mx-auto px-6 py-8">
 	<!-- Header -->
-	<div class="mb-8 flex items-center justify-between">
+	<div class="mb-8 flex items-center justify-between gap-4 flex-wrap">
 		<div class="flex items-center gap-6 text-sm text-text-muted">
 			<span class="text-2xl font-bold text-text">{stats.total}</span>
 			<span>thoughts captured</span>
 		</div>
+
+		<!-- View Toggle -->
+		<div class="flex items-center gap-1 bg-bg-elevated rounded-lg p-1">
+			<button
+				onclick={switchToGrid}
+				class="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors
+					{viewMode === 'grid' ? 'bg-primary text-white shadow-sm' : 'text-text-muted hover:text-text'}"
+			>
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+						d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+				</svg>
+				Grid
+			</button>
+			<button
+				onclick={switchToCalendar}
+				class="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors
+					{viewMode === 'calendar' ? 'bg-primary text-white shadow-sm' : 'text-text-muted hover:text-text'}"
+			>
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+						d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+				</svg>
+				Calendar
+			</button>
+		</div>
+
 		<button
 			onclick={() => showCapture = !showCapture}
 			class="px-4 py-2 bg-primary hover:bg-primary-light text-white rounded-lg font-medium transition-colors"
@@ -242,6 +293,69 @@
 			{showCapture ? 'Close' : '+ Capture'}
 		</button>
 	</div>
+
+	<!-- ── Calendar View ──────────────────────────────────────────────── -->
+	{#if viewMode === 'calendar'}
+		<!-- Capture Form (calendar mode) -->
+		{#if showCapture}
+			<div class="mb-6 bg-bg-card border border-white/10 rounded-xl p-5">
+				<textarea
+					bind:value={captureContent}
+					placeholder="What's on your mind?"
+					rows={3}
+					class="w-full bg-transparent text-text placeholder:text-text-muted focus:outline-none resize-none"
+				></textarea>
+				<div class="flex justify-end gap-3 mt-3">
+					<button
+						onclick={() => showCapture = false}
+						class="px-4 py-2 text-text-muted hover:text-text transition-colors"
+					>
+						Cancel
+					</button>
+					<button
+						onclick={handleCapture}
+						disabled={!captureContent.trim() || capturing}
+						class="px-4 py-2 bg-primary hover:bg-primary-light disabled:opacity-50 text-white rounded-lg font-medium transition-colors"
+					>
+						{capturing ? 'Saving...' : 'Save'}
+					</button>
+				</div>
+			</div>
+		{/if}
+
+		{#if calendarLoading}
+			<div class="flex items-center justify-center py-24">
+				<div class="flex flex-col items-center gap-3">
+					<div class="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+					<div class="text-text-muted text-sm">Loading your thoughts...</div>
+				</div>
+			</div>
+		{:else}
+			<!-- Type legend bar -->
+			<div class="mb-5 flex items-center gap-3 flex-wrap">
+				{#each THOUGHT_TYPES as t}
+					<span class="flex items-center gap-1.5 text-xs text-text-muted">
+						<span
+							class="w-2.5 h-2.5 rounded-full"
+							style="background:{t.value === 'observation' ? '#6366f1' : t.value === 'task' ? '#f59e0b' : t.value === 'idea' ? '#22d3ee' : t.value === 'reference' ? '#a855f7' : '#ec4899'}"
+						></span>
+						{t.label}
+					</span>
+				{/each}
+				<span class="ml-auto text-xs text-text-muted">
+					{calendarThoughts.length} thoughts loaded
+				</span>
+			</div>
+
+			<Calendar
+				thoughts={calendarThoughts}
+				onSelectThought={(t) => { selectedThought = t; }}
+			/>
+		{/if}
+	{/if}
+
+	<!-- ── Grid View ───────────────────────────────────────────────────── -->
+	{#if viewMode === 'grid'}
 
 	<!-- Capture Form -->
 	{#if showCapture}
@@ -466,6 +580,9 @@
 			{/each}
 		</div>
 	{/if}
+
+	{/if}
+	<!-- ── End Grid View ──────────────────────────────────────────────── -->
 </div>
 
 {#if selectedThought}
