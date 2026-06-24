@@ -29,22 +29,44 @@
 	];
 
 	// ── Stop words ────────────────────────────────────────────────────────
+	// Articles, determiners
 	const STOP_WORDS = new Set([
-		'the', 'and', 'for', 'that', 'this', 'with', 'from', 'have', 'been',
-		'will', 'would', 'could', 'should', 'about', 'into', 'their', 'there',
-		'when', 'what', 'which', 'where', 'your', 'also', 'some', 'than',
-		'then', 'them', 'they', 'were', 'more', 'just', 'like', 'over',
-		'such', 'very', 'each', 'much', 'only', 'need', 'make', 'made',
-		'time', 'work', 'used', 'using', 'going', 'look', 'well', 'even',
-		'back', 'after', 'know', 'most', 'may', 'want', 'here', 'take',
-		'come', 'been', 'good', 'keep', 'find', 'give', 'way', 'our',
-		'help', 'how', 'not', 'out', 'can', 'has', 'had', 'his', 'her',
-		'all', 'any', 'are', 'but', 'per', 'one', 'two', 'new', 'get',
-		'its', 'now', 'see', 'set', 'use', 'was', 'who', 'got', 'let',
-		'put', 'too', 'add', 'ask', 'run', 'add', 'did', 'via', 'yet',
-		'does', 'dont', 'isnt', 'cant', 'wont', 'didnt', 'hasnt', 'havent',
-		'ive', 'youre', 'were', 'theyre', 'its', 'thats', 'dont', 'weve',
-		'heres', 'theres', 'whats', 'okay', 'sure', 'really', 'still', 'think'
+		'a', 'an', 'the', 'this', 'that', 'these', 'those',
+		// Conjunctions
+		'and', 'but', 'or', 'so', 'because', 'although', 'since', 'as',
+		// Prepositions
+		'like', 'for', 'of', 'with', 'at', 'by', 'in', 'on', 'to', 'from',
+		'into', 'onto', 'through', 'over', 'under', 'about', 'between',
+		// Personal pronouns
+		'i', 'me', 'my', 'mine', 'we', 'us', 'our', 'ours',
+		'you', 'your', 'yours', 'he', 'him', 'his', 'she', 'her', 'hers',
+		'it', 'its', 'they', 'them', 'their', 'theirs',
+		// Relative / interrogative pronouns
+		'what', 'which', 'who', 'whom', 'whose',
+		// Auxiliary / modal verbs
+		'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
+		'have', 'has', 'had', 'do', 'does', 'did',
+		'will', 'would', 'shall', 'should', 'can', 'could',
+		'may', 'might', 'must', 'ought',
+		// Negation / affirmation
+		'not', 'no', 'yes',
+		// Degree adverbs & quantifiers
+		'very', 'too', 'quite', 'much', 'more', 'most',
+		'some', 'any', 'all', 'few', 'many', 'each', 'every',
+		'other', 'another', 'such',
+		// Common filler words (existing set, not covered above)
+		'also', 'than', 'then', 'there', 'when', 'where', 'just', 'only',
+		'even', 'back', 'after', 'well', 'still', 'here', 'now', 'yet',
+		'via', 'per', 'out', 'how', 'one', 'two', 'new', 'get', 'got',
+		'let', 'put', 'see', 'set', 'use', 'ask', 'run', 'add', 'want',
+		'know', 'come', 'make', 'made', 'look', 'keep', 'find', 'give',
+		'take', 'need', 'help', 'work', 'used', 'using', 'going', 'think',
+		'good', 'okay', 'sure', 'really',
+		// Contractions (apostrophes stripped during processing)
+		'dont', 'isnt', 'cant', 'wont', 'didnt', 'hasnt', 'havent',
+		'ive', 'youre', 'theyre', 'thats', 'weve', 'heres', 'theres', 'whats',
+		// User-defined additions
+		'done', 'complete', 'check', 'playing', 'whatever', 'same'
 	]);
 
 	// ── Word processing ───────────────────────────────────────────────────
@@ -81,7 +103,7 @@
 
 		const sorted = Array.from(freq.entries())
 			.sort((a, b) => b[1].count - a[1].count)
-			.slice(0, 160);
+			.slice(0, 100);
 
 		if (!sorted.length) return [];
 

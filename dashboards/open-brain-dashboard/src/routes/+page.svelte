@@ -250,6 +250,12 @@
 			showCapture = false;
 			await loadStats();
 			if (hasSearched) await loadThoughts();
+			// Force calendar/wordcloud to reload so the new thought appears
+			// and deduplication runs on the refreshed dataset.
+			if (viewMode === 'calendar' || viewMode === 'wordcloud') {
+				calendarThoughts = [];
+				await loadAllThoughts();
+			}
 		} catch (err) {
 			console.error('Failed to capture:', err);
 		}

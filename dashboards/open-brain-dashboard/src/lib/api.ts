@@ -128,6 +128,29 @@ export async function getStats(): Promise<{
 	return parseStatsFromText(text);
 }
 
+/**
+ * Deduplicate thoughts by content within the same calendar day.
+ * When the same text is captured multiple times on the same day (e.g. due to
+ * retries or MCP double-writes), only the earliest occurrence is kept.
+ */
+function deduplicateThoughts(thoughts: Thought[]): Thought[] {
+	const seen = new Set<string>();
+	const result: Thought[] = [];
+	// Sort ascending so we always keep the earliest capture
+	const sorted = [...thoughts].sort(
+		(a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+	);
+	for (const t of sorted) {
+		const d = new Date(t.created_at);
+		const dayKey = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+		const key = `${dayKey}::${t.content.trim().toLowerCase()}`;
+		if (seen.has(key)) continue;
+		seen.add(key);
+		result.push(t);
+	}
+	return result;
+}
+
 export async function getThoughts(params: {
 	limit?: number;
 	type?: ThoughtType | null;
@@ -143,7 +166,7 @@ export async function getThoughts(params: {
 		});
 		// Parse search results - different format
 		const text = result.content[0]?.text || '';
-		return parseSearchResults(text);
+		return deduplicateThoughts(parseSearchResults(text));
 	}
 	
 	const args: Record<string, unknown> = {
@@ -155,7 +178,7 @@ export async function getThoughts(params: {
 	
 	const result = await callMcpTool('list_thoughts', args);
 	const text = result.content[0]?.text || '';
-	return parseListResults(text);
+	return deduplicateThoughts(parseListResults(text));
 }
 
 function parseSearchResults(text: string): Thought[] {
