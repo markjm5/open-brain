@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte';
 	import Calendar from '$lib/components/Calendar.svelte';
 	import WordCloud from '$lib/components/WordCloud.svelte';
+	import ToDoCard from '$lib/components/ToDoCard.svelte';
 
 	type ViewMode = 'grid' | 'calendar' | 'wordcloud';
 
@@ -323,6 +324,9 @@
 			{showCapture ? 'Close' : '+ Capture'}
 		</button>
 	</div>
+
+	<!-- ── To-Do Card ─────────────────────────────────────────────────── -->
+	<ToDoCard onSelectThought={(t) => { selectedThought = t; }} />
 
 	<!-- ── Calendar View ──────────────────────────────────────────────── -->
 	{#if viewMode === 'calendar'}
