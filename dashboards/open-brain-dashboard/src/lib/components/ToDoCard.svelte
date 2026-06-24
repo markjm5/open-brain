@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { getThoughts } from '$lib/api';
+	import { supabase } from '$lib/supabase';
 	import type { Thought } from '$lib/types';
 	import { onMount } from 'svelte';
 
 	let { onSelectThought }: { onSelectThought: (t: Thought) => void } = $props();
 
-	const STORAGE_KEY = 'ob1-dismissed-tasks';
+	const LOCAL_KEY = 'ob1-dismissed-tasks';
 
 	let tasks = $state<Thought[]>([]);
 	let loading = $state(true);
@@ -13,45 +14,77 @@
 	let error = $state<string | null>(null);
 	let dismissed = $state<Set<string>>(new Set());
 	let showDismissed = $state(false);
+	let syncing = $state(false);
 
-	function loadDismissed(): Set<string> {
+	// ── Local cache (instant reads, no flicker) ───────────────────────────
+	function readLocal(): Set<string> {
 		try {
-			const raw = localStorage.getItem(STORAGE_KEY);
+			const raw = localStorage.getItem(LOCAL_KEY);
 			return raw ? new Set(JSON.parse(raw) as string[]) : new Set();
 		} catch {
 			return new Set();
 		}
 	}
 
-	function saveDismissed(set: Set<string>) {
-		localStorage.setItem(STORAGE_KEY, JSON.stringify([...set]));
+	function writeLocal(set: Set<string>) {
+		localStorage.setItem(LOCAL_KEY, JSON.stringify([...set]));
+	}
+
+	// ── Supabase user-metadata sync ───────────────────────────────────────
+	async function loadFromSupabase(): Promise<Set<string> | null> {
+		const { data, error } = await supabase.auth.getUser();
+		if (error || !data.user) return null;
+		const raw = data.user.user_metadata?.dismissed_tasks as string[] | undefined;
+		return raw ? new Set(raw) : new Set();
+	}
+
+	async function saveToSupabase(set: Set<string>) {
+		syncing = true;
+		await supabase.auth.updateUser({
+			data: { dismissed_tasks: [...set] }
+		});
+		syncing = false;
+	}
+
+	async function persist(set: Set<string>) {
+		writeLocal(set);
+		await saveToSupabase(set);
 	}
 
 	function dismiss(task: Thought) {
 		const next = new Set(dismissed);
 		next.add(task.content.trim());
 		dismissed = next;
-		saveDismissed(next);
+		persist(next);
 	}
 
 	function restore(task: Thought) {
 		const next = new Set(dismissed);
 		next.delete(task.content.trim());
 		dismissed = next;
-		saveDismissed(next);
+		persist(next);
 	}
 
 	let openTasks = $derived(tasks.filter((t) => !dismissed.has(t.content.trim())));
 	let doneTasks = $derived(tasks.filter((t) => dismissed.has(t.content.trim())));
 
 	onMount(async () => {
-		dismissed = loadDismissed();
-		try {
-			tasks = await getThoughts({ type: 'task', limit: 100 });
-		} catch (e) {
-			error = 'Could not load tasks';
-		} finally {
-			loading = false;
+		// Show local cache immediately so there's no blank flash
+		dismissed = readLocal();
+
+		// Fetch tasks and remote dismissed state in parallel
+		const [, remote] = await Promise.all([
+			getThoughts({ type: 'task', limit: 100 }).then(
+				(t) => { tasks = t; },
+				() => { error = 'Could not load tasks'; }
+			).finally(() => { loading = false; }),
+			loadFromSupabase()
+		]);
+
+		// Remote is source of truth — merge and update local cache
+		if (remote !== null) {
+			dismissed = remote;
+			writeLocal(remote);
 		}
 	});
 
@@ -83,6 +116,12 @@
 					>
 						{showDismissed ? 'Hide' : `+${doneTasks.length} done`}
 					</button>
+				{/if}
+				{#if syncing}
+					<span class="flex items-center gap-1 text-xs text-text-muted">
+						<span class="w-2.5 h-2.5 border border-text-muted border-t-transparent rounded-full animate-spin"></span>
+						Saving…
+					</span>
 				{/if}
 			{/if}
 		</div>
