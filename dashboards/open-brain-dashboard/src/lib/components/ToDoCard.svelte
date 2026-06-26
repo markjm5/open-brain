@@ -65,8 +65,11 @@
 		persist(next);
 	}
 
-	let openTasks = $derived(tasks.filter((t) => !dismissed.has(t.content.trim())));
-	let doneTasks = $derived(tasks.filter((t) => dismissed.has(t.content.trim())));
+	const byDateDesc = (a: Thought, b: Thought) =>
+		new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+
+	let openTasks = $derived(tasks.filter((t) => !dismissed.has(t.content.trim())).sort(byDateDesc));
+	let doneTasks = $derived(tasks.filter((t) => dismissed.has(t.content.trim())).sort(byDateDesc));
 
 	onMount(async () => {
 		// Show local cache immediately so there's no blank flash
