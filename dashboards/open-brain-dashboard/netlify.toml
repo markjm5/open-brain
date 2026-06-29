@@ -1,0 +1,10 @@
+# adapter-netlify reads this file to locate the publish directory and emit
+# serverless functions correctly. Netlify itself reads the repo-root netlify.toml;
+# this file is only for the SvelteKit build adapter.
+
+[build]
+  command   = "npm run build"
+  publish   = "build"
+
+[build.environment]
+  NODE_VERSION = "22"
