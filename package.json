@@ -1,0 +1,12 @@
+{
+  "name": "open-brain-deploy",
+  "private": true,
+  "description": "Root manifest so Heroku (and other root-only buildpacks) can detect and build the open-brain-dashboard, which lives in a subfolder of this monorepo.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "heroku-postbuild": "npm --prefix dashboards/open-brain-dashboard install --include=dev && npm --prefix dashboards/open-brain-dashboard run build",
+    "start": "node dashboards/open-brain-dashboard/build/index.js"
+  }
+}
