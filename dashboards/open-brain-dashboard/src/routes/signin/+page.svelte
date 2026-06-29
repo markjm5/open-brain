@@ -1,43 +1,33 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { supabase } from '$lib/supabase';
+	import { enhance } from '$app/forms';
+	import type { ActionData } from './$types';
 
-	let email = $state('');
-	let password = $state('');
+	let { form }: { form: ActionData } = $props();
 	let loading = $state(false);
-	let errorMessage = $state('');
-
-	async function handleSubmit(event: SubmitEvent) {
-		event.preventDefault();
-		loading = true;
-		errorMessage = '';
-
-		const { error } = await supabase.auth.signInWithPassword({
-			email: email.trim(),
-			password,
-		});
-
-		if (error) {
-			errorMessage = error.message;
-			loading = false;
-			return;
-		}
-
-		await goto('/');
-	}
 </script>
 
 <div class="max-w-md mx-auto px-6 py-16">
 	<div class="bg-bg-card border border-white/10 rounded-2xl p-8">
 		<h1 class="text-2xl font-semibold mb-8">Sign in</h1>
 
-		<form class="space-y-4" onsubmit={handleSubmit}>
+		<form
+			method="POST"
+			action="?/login"
+			class="space-y-4"
+			use:enhance={() => {
+				loading = true;
+				return async ({ update }) => {
+					loading = false;
+					await update();
+				};
+			}}
+		>
 			<div>
 				<label class="text-sm text-text-muted" for="email">Email</label>
 				<input
 					id="email"
+					name="email"
 					type="email"
-					bind:value={email}
 					placeholder="you@example.com"
 					autocomplete="email"
 					required
@@ -49,8 +39,8 @@
 				<label class="text-sm text-text-muted" for="password">Password</label>
 				<input
 					id="password"
+					name="password"
 					type="password"
-					bind:value={password}
 					placeholder="••••••••"
 					autocomplete="current-password"
 					required
@@ -58,8 +48,8 @@
 				/>
 			</div>
 
-			{#if errorMessage}
-				<div class="text-sm text-red-400">{errorMessage}</div>
+			{#if form?.error}
+				<div class="text-sm text-red-400">{form.error}</div>
 			{/if}
 
 			<button
