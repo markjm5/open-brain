@@ -1,0 +1,1 @@
+web: NODE_OPTIONS=--max-http-header-size=65536 node build/index.js
