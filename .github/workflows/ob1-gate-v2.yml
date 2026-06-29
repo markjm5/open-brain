@@ -14,12 +14,11 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
     branches: [main]
-  # GitHub's required-status-checks machinery evaluates every push to main
-  # against required checks.  Without an explicit push trigger the workflow
-  # can't run for those commits, so GitHub records a 0-job "failure" and
-  # sends failure notifications.  Adding push here lets the workflow run but
-  # the job-level `if` below skips all work immediately, producing a
-  # "skipped" (neutral/pass) result instead.
+  # GitHub's required-status-checks machinery records a 0-job "failure" for
+  # every direct push to main when the workflow only has a pull_request
+  # trigger, generating spurious failure notifications.  Adding push here
+  # lets the workflow run; step-level guards below exit cleanly for pushes
+  # so the job always completes with success.
   push:
     branches: [main]
 
@@ -30,21 +29,28 @@ jobs:
   review:
     name: OB1 Review
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
     steps:
+      - name: Skip gate for direct pushes to main
+        if: github.event_name != 'pull_request'
+        run: echo "Direct push to main — PR gate does not apply."
+
       - name: Checkout PR head safely
+        if: github.event_name == 'pull_request'
         uses: actions/checkout@v4
         with:
           ref: refs/pull/${{ github.event.pull_request.number }}/head
           fetch-depth: 0
 
       - name: Fetch base branch
+        if: github.event_name == 'pull_request'
         run: git fetch origin "${{ github.event.pull_request.base.ref }}" --depth=1
 
       - name: Install metadata schema validator
+        if: github.event_name == 'pull_request'
         run: python3 -m pip install check-jsonschema
 
       - name: Get changed files
+        if: github.event_name == 'pull_request'
         id: changed
         run: |
           # Get files changed in this PR
@@ -61,6 +67,7 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Run review checks
+        if: github.event_name == 'pull_request'
         id: review
         run: |
           CHANGED_FILES="${{ steps.changed.outputs.files }}"
@@ -633,6 +640,7 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Write gate artifact
+        if: github.event_name == 'pull_request'
         env:
           REVIEW_COMMENT: ${{ steps.review.outputs.comment }}
           REVIEW_FAILED: ${{ steps.review.outputs.failed }}
@@ -670,7 +678,7 @@ jobs:
             }' > gate-artifact/ob1-review-context.json
 
       - name: Upload gate artifact
-        if: always()
+        if: always() && github.event_name == 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: ob1-pr-gate-context
