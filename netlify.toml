@@ -11,7 +11,13 @@
 [build.environment]
   NODE_VERSION = "22"
 
-# Required environment variables (set these in Netlify UI → Site settings → Environment variables):
+# Required environment variables — set ALL of these in Netlify UI → Site settings → Environment variables.
+# Variables in [build.environment] above only apply at build time; the entries below must also exist
+# as site-level env vars so the Netlify serverless function runtime picks them up.
+#
+#   NODE_OPTIONS        = --max-http-header-size=65536
+#                         (Supabase session cookies can exceed Node's default 16 KB header limit,
+#                          causing HTTP 400 on every authenticated request. This raises the cap to 64 KB.)
 #
 #   MCP_URL             = https://YOUR-PROJECT.supabase.co/functions/v1/open-brain-mcp
 #   MCP_KEY             = your-mcp-access-key

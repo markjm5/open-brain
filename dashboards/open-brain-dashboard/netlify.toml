@@ -8,3 +8,9 @@
 
 [build.environment]
   NODE_VERSION = "22"
+  # Supabase session cookies can exceed Node's default 16 KB header limit,
+  # causing HTTP 400 on every authenticated page load. This raises the cap to 64 KB.
+  # IMPORTANT: also set NODE_OPTIONS in the Netlify UI → Site settings → Environment variables
+  # so the serverless function runtime inherits it (netlify.toml [build.environment] is
+  # build-time only and does not automatically flow to function execution).
+  NODE_OPTIONS  = "--max-http-header-size=65536"
