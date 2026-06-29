@@ -51,6 +51,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const mcpKey = privateEnv.MCP_KEY || publicEnv.PUBLIC_MCP_KEY;
 
 		if (!mcpUrl || !mcpKey) {
+			console.error(
+				`[api/mcp] Missing config: MCP_URL=${mcpUrl ? 'set' : 'MISSING'}, MCP_KEY=${mcpKey ? 'set' : 'MISSING'}. Set them as environment/config vars.`
+			);
 			return json(
 				{ error: 'Missing MCP_URL/MCP_KEY (or PUBLIC_MCP_URL/PUBLIC_MCP_KEY) in your environment config' },
 				{ status: 500 },
@@ -76,6 +79,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		if (!upstream.ok) {
 			const text = await upstream.text().catch(() => '');
+			console.error(`[api/mcp] Upstream HTTP ${upstream.status} from MCP server:`, text);
 			return json({ error: `MCP upstream HTTP ${upstream.status}`, details: text }, { status: 502 });
 		}
 
@@ -87,6 +91,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		return json({ result: parsed.result ?? null });
 	} catch (err: unknown) {
 		const message = err instanceof Error ? err.message : 'Unknown proxy error';
+		console.error('[api/mcp] Proxy error:', err);
 		return json({ error: message }, { status: 500 });
 	}
 };
