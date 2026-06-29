@@ -14,6 +14,14 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
     branches: [main]
+  # GitHub's required-status-checks machinery evaluates every push to main
+  # against required checks.  Without an explicit push trigger the workflow
+  # can't run for those commits, so GitHub records a 0-job "failure" and
+  # sends failure notifications.  Adding push here lets the workflow run but
+  # the job-level `if` below skips all work immediately, producing a
+  # "skipped" (neutral/pass) result instead.
+  push:
+    branches: [main]
 
 permissions:
   contents: read
@@ -22,6 +30,7 @@ jobs:
   review:
     name: OB1 Review
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
     steps:
       - name: Checkout PR head safely
         uses: actions/checkout@v4
